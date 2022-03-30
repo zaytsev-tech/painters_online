@@ -1,12 +1,13 @@
 import { ChangeEvent, FC } from "react";
 import "../styles/toolbar.scss";
-import toolState from "../store/toolState";
-import Brush from "../tools/Brush";
-import canvasState from "../store/canvasState";
-import Rect from "../tools/Rect";
-import Circle from "../tools/Circle";
-import Eraser from "../tools/Eraser";
-import Line from "../tools/Line";
+import toolState from "../store/tool-state";
+import Brush from "../tools/brush";
+import canvasState from "../store/canvas-state";
+import Rect from "../tools/rect";
+import Circle from "../tools/circle";
+import Eraser from "../tools/eraser";
+import Line from "../tools/line";
+import { downloadPicture } from "../utils/download-picture";
 
 const Toolbar: FC = () => {
   const changeColor = (e: ChangeEvent<HTMLInputElement>) => {
@@ -19,13 +20,29 @@ const Toolbar: FC = () => {
       <button
         className="toolbar__btn brush"
         onClick={() => {
-          toolState.setTool(new Brush(canvasState.canvas));
+          canvasState.socket &&
+            canvasState.sessionId &&
+            toolState.setTool(
+              new Brush(
+                canvasState.canvas,
+                canvasState.socket,
+                canvasState.sessionId
+              )
+            );
         }}
       />
       <button
         className="toolbar__btn rect"
         onClick={() => {
-          toolState.setTool(new Rect(canvasState.canvas));
+          toolState.setTool(
+            canvasState.socket &&
+              canvasState.sessionId &&
+              new Rect(
+                canvasState.canvas,
+                canvasState.socket,
+                canvasState.sessionId
+              )
+          );
         }}
       />
       <button
@@ -59,7 +76,7 @@ const Toolbar: FC = () => {
         className="toolbar__btn redo"
         onClick={() => canvasState.redo()}
       />
-      <button className="toolbar__btn save" />
+      <button className="toolbar__btn save" onClick={() => downloadPicture()} />
     </div>
   );
 };

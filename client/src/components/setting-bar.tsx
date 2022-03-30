@@ -1,5 +1,5 @@
 import { FC } from "react";
-import toolState from "../store/toolState";
+import toolState from "../store/tool-state";
 import "../styles/toolbar.scss";
 
 const SettingBar: FC = () => {

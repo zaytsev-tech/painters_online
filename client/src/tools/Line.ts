@@ -1,4 +1,4 @@
-import Tool from "./Tool";
+import Tool from "./tool";
 
 export default class Line extends Tool {
   mouseDown = false;
@@ -43,7 +43,6 @@ export default class Line extends Tool {
       this.ctx.moveTo(this.startX, this.startY);
       this.ctx.lineTo(x, y);
       this.ctx.stroke();
-      console.log("drawed");
     };
   }
 }

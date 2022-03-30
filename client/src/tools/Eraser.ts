@@ -1,4 +1,4 @@
-import Tool from "./Tool";
+import Tool from "./tool";
 
 export default class Eraser extends Tool {
   mouseDown = false;
@@ -36,6 +36,5 @@ export default class Eraser extends Tool {
     this.ctx.lineTo(x, y);
     this.ctx.stroke();
     this.ctx.strokeStyle = "white";
-    console.log("drawed");
   }
 }

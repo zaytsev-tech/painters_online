@@ -1,8 +1,8 @@
 import React from "react";
 import "./App.css";
-import Canvas from "./components/Canvas";
-import SettingBar from "./components/SettingBar";
-import Toolbar from "./components/Toolbar";
+import Canvas from "./components/canvas";
+import SettingBar from "./components/setting-bar";
+import Toolbar from "./components/toolbar";
 import "./styles/app.scss";
 
 function App() {

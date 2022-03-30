@@ -2,10 +2,12 @@ import { observer } from "mobx-react-lite";
 import { FC, useEffect, useRef, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import canvasState from "../store/canvasState";
-import toolState from "../store/toolState";
+import canvasState from "../store/canvas-state";
+import toolState from "../store/tool-state";
 import "../styles/canvas.scss";
-import Brush from "../tools/Brush";
+import Brush from "../tools/brush";
+import Rect from "../tools/rect";
+import axios from "axios";
 
 const Canvas: FC = observer(() => {
   const params = useParams();
@@ -15,7 +17,31 @@ const Canvas: FC = observer(() => {
 
   useEffect(() => {
     canvasState.setCanvas(canvasRef.current);
-    toolState.setTool(new Brush(canvasRef.current));
+    const ctx = canvasRef.current?.getContext("2d");
+    axios
+      .get(`http://localhost:5000/image?id=${params.id}`)
+      .then((response) => {
+        const image = new Image();
+        image.src = response.data;
+        image.onload = () => {
+          if (canvasRef.current && ctx) {
+            ctx.clearRect(
+              0,
+              0,
+              canvasRef.current.width,
+              canvasRef.current.height
+            );
+            ctx.drawImage(
+              image,
+              0,
+              0,
+              canvasRef.current.width,
+              canvasRef.current.height
+            );
+            ctx.stroke();
+          }
+        };
+      });
   }, []);
 
   useEffect(() => {
@@ -33,6 +59,8 @@ const Canvas: FC = observer(() => {
         );
       };
 
+      toolState.setTool(new Brush(canvasRef.current, socket, params.id || ""));
+
       socket.onmessage = (event: MessageEvent) => {
         const msg = JSON.parse(event.data);
         switch (msg.method) {
@@ -47,11 +75,40 @@ const Canvas: FC = observer(() => {
     }
   }, [canvasState.username]);
 
-  const drawHandler = (msg: any) => {};
+  const drawHandler = (msg: any) => {
+    const figure = msg.figure;
+    const ctx = canvasRef.current?.getContext("2d");
+    switch (figure.type) {
+      case "brush":
+        Brush.draw(ctx, figure.x, figure.y);
+        break;
+      case "rect":
+        Rect.staticDraw(
+          ctx,
+          figure.x,
+          figure.y,
+          figure.width,
+          figure.height,
+          figure.color
+        );
+        break;
+      case "finish":
+        ctx?.beginPath();
+        break;
+    }
+  };
 
   const mouseDownHandler = () => {
     canvasRef?.current?.toDataURL() &&
       canvasState.pushToUndo(canvasRef.current.toDataURL());
+  };
+
+  const mouseUpHandler = () => {
+    axios
+      .post(`http://localhost:5000/image?id=${params.id}`, {
+        img: canvasRef.current?.toDataURL(),
+      })
+      .then((response) => response.data);
   };
 
   const connectHandler = () => {
@@ -87,6 +144,7 @@ const Canvas: FC = observer(() => {
       </Modal>
       <canvas
         onMouseDown={mouseDownHandler}
+        onMouseUp={mouseUpHandler}
         ref={canvasRef}
         height={400}
         width={600}

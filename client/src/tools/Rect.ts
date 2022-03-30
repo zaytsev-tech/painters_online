@@ -1,13 +1,15 @@
-import Tool from "./Tool";
+import Tool from "./tool";
 
 export default class Rect extends Tool {
   mouseDown = false;
   saved = "";
   startX = 0;
   startY = 0;
+  width = 0;
+  height = 0;
 
-  constructor(canvas: any) {
-    super(canvas);
+  constructor(canvas: any, socket: any, id: string) {
+    super(canvas, socket, id);
     this.listen();
   }
 
@@ -19,6 +21,20 @@ export default class Rect extends Tool {
 
   mouseUpHandler(e: MouseEvent) {
     this.mouseDown = false;
+    this.socket.send(
+      JSON.stringify({
+        method: "draw",
+        id: this.id,
+        figure: {
+          type: "rect",
+          x: this.startX,
+          y: this.startY,
+          width: this.width,
+          height: this.height,
+          color: this.ctx.fillStyle,
+        },
+      })
+    );
   }
 
   mouseDownHandler(e: any) {
@@ -33,10 +49,25 @@ export default class Rect extends Tool {
     if (this.mouseDown) {
       let currentX = e.pageX - e.target.offsetLeft;
       let currentY = e.pageY - e.target.offsetTop;
-      let width = currentX - this.startX;
-      let height = currentY - this.startY;
-      this.draw(this.startX, this.startY, width, height);
+      this.width = currentX - this.startX;
+      this.height = currentY - this.startY;
+      this.draw(this.startX, this.startY, this.width, this.height);
     }
+  }
+
+  static staticDraw(
+    ctx: any,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    color: string
+  ) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.rect(x, y, w, h);
+    ctx.fill();
+    ctx.stroke();
   }
 
   draw(x: number, y: number, w: number, h: number) {
@@ -49,7 +80,6 @@ export default class Rect extends Tool {
       this.ctx.rect(x, y, w, h);
       this.ctx.fill();
       this.ctx.stroke();
-      console.log("rect");
     };
   }
 }
