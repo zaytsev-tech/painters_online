@@ -1,4 +1,4 @@
-import Tool from "./Tool";
+import Tool from "./tool";
 
 export default class Circle extends Tool {
   mouseDown = false;
