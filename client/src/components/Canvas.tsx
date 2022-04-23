@@ -47,6 +47,7 @@ const Canvas: FC = observer(() => {
   useEffect(() => {
     if (canvasState.username) {
       const socket = new WebSocket("ws://localhost:5000/");
+      toolState.setTool(new Brush(canvasRef.current, socket, params.id || ""));
       canvasState.setSocket(socket);
       params.id && canvasState.setSessionId(params.id);
       socket.onopen = () => {
@@ -58,8 +59,6 @@ const Canvas: FC = observer(() => {
           })
         );
       };
-
-      toolState.setTool(new Brush(canvasRef.current, socket, params.id || ""));
 
       socket.onmessage = (event: MessageEvent) => {
         const msg = JSON.parse(event.data);
@@ -80,7 +79,13 @@ const Canvas: FC = observer(() => {
     const ctx = canvasRef.current?.getContext("2d");
     switch (figure.type) {
       case "brush":
-        Brush.draw(ctx, figure.x, figure.y);
+        Brush.draw(
+          ctx,
+          figure.x,
+          figure.y,
+          figure.strokeColor,
+          figure.lineWidth
+        );
         break;
       case "rect":
         Rect.staticDraw(
@@ -89,7 +94,9 @@ const Canvas: FC = observer(() => {
           figure.y,
           figure.width,
           figure.height,
-          figure.color
+          figure.color,
+          figure.strokeColor,
+          figure.lineWidth
         );
         break;
       case "finish":
