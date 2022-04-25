@@ -8,6 +8,7 @@ import "../styles/canvas.scss";
 import Brush from "../tools/brush";
 import Rect from "../tools/rect";
 import axios from "axios";
+import Circle from "../tools/circle";
 
 const Canvas: FC = observer(() => {
   const params = useParams();
@@ -79,7 +80,7 @@ const Canvas: FC = observer(() => {
     const ctx = canvasRef.current?.getContext("2d");
     switch (figure.type) {
       case "brush":
-        Brush.draw(
+        Brush.staticDraw(
           ctx,
           figure.x,
           figure.y,
@@ -98,6 +99,9 @@ const Canvas: FC = observer(() => {
           figure.strokeColor,
           figure.lineWidth
         );
+        break;
+      case "circle":
+        Circle.staticDraw(ctx, figure.x, figure.y, figure.width, figure.height);
         break;
       case "finish":
         ctx?.beginPath();

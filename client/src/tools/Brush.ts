@@ -53,7 +53,7 @@ export default class Brush extends Tool {
     }
   }
 
-  static draw(
+  static staticDraw(
     ctx: any,
     x: number,
     y: number,
@@ -64,5 +64,12 @@ export default class Brush extends Tool {
     ctx.strokeStyle = strokeColor;
     ctx.lineWidth = lineWidth;
     ctx.stroke();
+  }
+
+  draw(ctx: any, x: number, y: number, strokeColor: string, lineWidth: number) {
+    this.ctx.lineTo(x, y);
+    this.ctx.strokeStyle = strokeColor;
+    this.ctx.lineWidth = lineWidth;
+    this.ctx.stroke();
   }
 }
