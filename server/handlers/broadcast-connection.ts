@@ -1,6 +1,6 @@
-import { WsMessageType } from "../index";
+import { WsCanvasMethodType } from "../index";
 
-export function broadcastConnection(aWss: any, msg: WsMessageType) {
+export function broadcastConnection(aWss: any, msg: WsCanvasMethodType) {
   aWss.clients.forEach((client: any) => {
     if (client.id === msg.id) {
       client.send(JSON.stringify(msg));

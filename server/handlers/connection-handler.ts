@@ -1,6 +1,5 @@
-import { WsMessageType } from "../index";
-import { broadcastConnection } from "./broadcast-connection";
+import { WsCanvasMethodType } from "../index";
 
-export function connectionHandler(ws: any, msg: WsMessageType) {
+export function connectionHandler(ws: any, msg: WsCanvasMethodType) {
   ws.id = msg.id;
 }

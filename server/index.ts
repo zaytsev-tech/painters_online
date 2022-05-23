@@ -1,4 +1,5 @@
 import { broadcastConnection } from "./handlers/broadcast-connection";
+import { broadcastMessages } from "./handlers/broadcast-messages";
 import { connectionHandler } from "./handlers/connection-handler";
 
 const express = require("express");
@@ -14,20 +15,31 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-export type WsMessageType = {
+export type WsCanvasMethodType = {
   id: string;
   username: string;
   method: string;
 };
 
+export type WsMessageType = {
+  event: string;
+  id: number;
+  username: string;
+  text: string;
+};
+
 app.ws("/", (ws: any, req: any) => {
   ws.send("Connection established!");
   ws.on("message", (msg: any) => {
-    const parsedMsg: WsMessageType = JSON.parse(msg);
+    const parsedMsg: WsCanvasMethodType = JSON.parse(msg);
     switch (parsedMsg.method) {
       case "connection":
         connectionHandler(ws, parsedMsg);
         broadcastConnection(aWss, parsedMsg);
+        broadcastMessages(aWss, msg);
+        break;
+      case "message":
+        broadcastMessages(aWss, msg);
         break;
       case "draw":
         broadcastConnection(aWss, parsedMsg);
