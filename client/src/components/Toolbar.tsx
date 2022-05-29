@@ -11,7 +11,7 @@ import { downloadPicture } from "../utils/download-picture";
 
 const Toolbar: FC = () => {
   const changeColor = (e: ChangeEvent<HTMLInputElement>) => {
-    toolState.setStrokeColor(e.target.value);
+    toolState.setStrokeColor("#000000");
     toolState.setFillColor(e.target.value);
   };
 

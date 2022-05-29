@@ -32,6 +32,8 @@ export default class Rect extends Tool {
           width: this.width,
           height: this.height,
           color: this.ctx.fillStyle,
+          strokeColor: this.ctx.strokeStyle,
+          lineWidth: this.ctx.lineWidth,
         },
       })
     );
@@ -51,7 +53,15 @@ export default class Rect extends Tool {
       let currentY = e.pageY - e.target.offsetTop;
       this.width = currentX - this.startX;
       this.height = currentY - this.startY;
-      this.draw(this.startX, this.startY, this.width, this.height);
+      this.draw(
+        this.startX,
+        this.startY,
+        this.width,
+        this.height,
+        this.ctx.fillStyle,
+        this.ctx.strokeStyle,
+        this.ctx.lineWidth
+      );
     }
   }
 
@@ -61,21 +71,36 @@ export default class Rect extends Tool {
     y: number,
     w: number,
     h: number,
-    color: string
+    color: string,
+    strokeColor: string,
+    lineWidth: number
   ) {
     ctx.fillStyle = color;
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = lineWidth;
     ctx.beginPath();
     ctx.rect(x, y, w, h);
     ctx.fill();
     ctx.stroke();
   }
 
-  draw(x: number, y: number, w: number, h: number) {
+  draw(
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    color: string,
+    strokeColor: string,
+    lineWidth: number
+  ) {
     const image = new Image();
     image.src = this.saved;
     image.onload = () => {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.drawImage(image, 0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.fillStyle = color;
+      this.ctx.strokeStyle = strokeColor;
+      this.ctx.lineWidth = lineWidth;
       this.ctx.beginPath();
       this.ctx.rect(x, y, w, h);
       this.ctx.fill();

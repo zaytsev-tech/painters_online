@@ -5,6 +5,8 @@ export default class Circle extends Tool {
   saved = "";
   startX = 0;
   startY = 0;
+  width = 0;
+  height = 0;
 
   constructor(canvas: any) {
     super(canvas);
@@ -19,6 +21,19 @@ export default class Circle extends Tool {
 
   mouseUpHandler(e: MouseEvent) {
     this.mouseDown = false;
+    this.socket.send(
+      JSON.stringify({
+        method: "draw",
+        id: this.id,
+        figure: {
+          type: "circle",
+          x: this.startX,
+          y: this.startY,
+          w: this.width,
+          h: this.height,
+        },
+      })
+    );
   }
 
   mouseDownHandler(e: any) {
@@ -33,10 +48,18 @@ export default class Circle extends Tool {
     if (this.mouseDown) {
       let currentX = e.pageX - e.target.offsetLeft;
       let currentY = e.pageY - e.target.offsetTop;
-      let width = currentX - this.startX;
-      let height = currentY - this.startY;
-      this.draw(this.startX, this.startY, width, height);
+      this.width = currentX - this.startX;
+      this.height = currentY - this.startY;
+      this.draw(this.startX, this.startY, this.width, this.height);
     }
+  }
+
+  static staticDraw(ctx: any, x: number, y: number, w: number, h: number) {
+    ctx.beginPath();
+    w = w < 0 ? -w : w;
+    ctx.ellipse(x, y, w, w, Math.PI / 2, 0, 4 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
   }
 
   draw(x: number, y: number, w: number, h: number) {

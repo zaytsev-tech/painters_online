@@ -11,8 +11,8 @@ const SettingBar: FC = () => {
       <input
         id="line-width"
         type="number"
-        min={1}
-        defaultValue={1}
+        min={0}
+        defaultValue={0}
         max={50}
         onChange={(e) => toolState.setLineWidth(e.target.value)}
       />
@@ -22,6 +22,7 @@ const SettingBar: FC = () => {
       <input
         id="stroke-color"
         type="color"
+        defaultValue="#000000"
         onChange={(e) => toolState.setStrokeColor(e.target.value)}
       />
     </div>
