@@ -9,11 +9,23 @@ import Brush from "../tools/brush";
 import Rect from "../tools/rect";
 import axios from "axios";
 import Circle from "../tools/circle";
+import { ChatComponent } from "./chat";
+import { ChatMessageProps } from "./chat-message";
+
+type MessageType = {
+  id: string;
+  method: string;
+  username: string;
+  text: string;
+};
 
 const Canvas: FC = observer(() => {
   const params = useParams();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const userInputRef: any = useRef(null);
+  const [connected, setConnected] = useState(false);
+  const [webSocket, setWebSocket] = useState<WebSocket>();
+  const [messages, setMessages] = useState<Array<ChatMessageProps>>([]);
   const [modal, setModal] = useState(true);
 
   useEffect(() => {
@@ -48,10 +60,12 @@ const Canvas: FC = observer(() => {
   useEffect(() => {
     if (canvasState.username) {
       const socket = new WebSocket("ws://localhost:5000/");
+      setWebSocket(socket);
       toolState.setTool(new Brush(canvasRef.current, socket, params.id || ""));
       canvasState.setSocket(socket);
       params.id && canvasState.setSessionId(params.id);
       socket.onopen = () => {
+        setConnected(true);
         socket.send(
           JSON.stringify({
             id: params.id,
@@ -63,9 +77,16 @@ const Canvas: FC = observer(() => {
 
       socket.onmessage = (event: MessageEvent) => {
         const msg = JSON.parse(event.data);
+        console.log("msg", msg);
+
         switch (msg.method) {
           case "connection":
             console.log(`user ${msg.username} is connected`);
+            break;
+          case "message":
+            console.log("message:", { username: msg.username, text: msg.text });
+
+            setMessages([{ username: msg.username, text: msg.text }]);
             break;
           case "draw":
             drawHandler(msg);
@@ -153,6 +174,7 @@ const Canvas: FC = observer(() => {
           </Button>
         </Modal.Footer>
       </Modal>
+      {webSocket && <ChatComponent socket={webSocket} messages={messages} />}
       <canvas
         onMouseDown={mouseDownHandler}
         onMouseUp={mouseUpHandler}

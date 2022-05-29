@@ -1,7 +1,7 @@
 import { FC } from "react";
 import "../styles/chat.scss";
 
-interface ChatMessageProps {
+export interface ChatMessageProps {
   username: string;
   text: string;
 }

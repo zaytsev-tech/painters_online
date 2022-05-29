@@ -12,7 +12,6 @@ function App() {
       <Toolbar />
       <SettingBar />
       <Canvas />
-      <ChatComponent />
     </div>
   );
 }
