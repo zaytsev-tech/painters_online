@@ -10,7 +10,7 @@ import Rect from "../tools/rect";
 import axios from "axios";
 import Circle from "../tools/circle";
 import { ChatComponent } from "./chat";
-import { ChatMessageProps } from "./chat-message";
+import messagesState from "../store/messages-state";
 
 type MessageType = {
   id: string;
@@ -25,7 +25,9 @@ const Canvas: FC = observer(() => {
   const userInputRef: any = useRef(null);
   const [connected, setConnected] = useState(false);
   const [webSocket, setWebSocket] = useState<WebSocket>();
-  const [messages, setMessages] = useState<Array<ChatMessageProps>>([]);
+  const [messages, setMessages] = useState<Array<any>>(
+    messagesState.getMessages()
+  );
   const [modal, setModal] = useState(true);
 
   useEffect(() => {
@@ -77,16 +79,16 @@ const Canvas: FC = observer(() => {
 
       socket.onmessage = (event: MessageEvent) => {
         const msg = JSON.parse(event.data);
-        console.log("msg", msg);
 
         switch (msg.method) {
           case "connection":
             console.log(`user ${msg.username} is connected`);
             break;
           case "message":
-            console.log("message:", { username: msg.username, text: msg.text });
-
-            setMessages([{ username: msg.username, text: msg.text }]);
+            messagesState.addMessage({
+              username: msg.username,
+              text: msg.text,
+            });
             break;
           case "draw":
             drawHandler(msg);
@@ -174,7 +176,12 @@ const Canvas: FC = observer(() => {
           </Button>
         </Modal.Footer>
       </Modal>
-      {webSocket && <ChatComponent socket={webSocket} messages={messages} />}
+      {webSocket && (
+        <ChatComponent
+          socket={webSocket}
+          messages={messages.length ? messages : []}
+        />
+      )}
       <canvas
         onMouseDown={mouseDownHandler}
         onMouseUp={mouseUpHandler}
